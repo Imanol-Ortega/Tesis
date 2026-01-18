@@ -1,0 +1,29 @@
+# --- Entornos Virtuales ---
+venv/
+env/
+.env
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Datos (MUY IMPORTANTE PARA TU TESIS) ---
+# Ignoramos la carpeta data para no subir gigas de curvas de luz
+data/
+dataset/
+*.csv
+*.fits
+
+
+
+# --- IDEs y Sistemas ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Modelos (Opcional) ---
+# Si tus modelos pesan más de 100MB, GitHub los rechazará.
+# Descomenta abajo si prefieres no subirlos todavía.
+# models/
