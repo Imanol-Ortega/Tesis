@@ -16,9 +16,6 @@ def train_vae_reference():
 
     if not os.path.exists(PATH_MODELS): os.makedirs(PATH_MODELS)
 
-    # 1. Cargar Datos LIMPIOS (X_target)
-    # Tu tesis dice: "exceptuando los datos aumentados".
-    # Usamos X_target (la versión perfecta) como Input Y Output.
     try:
         X_clean = np.load(os.path.join(PATH_DATA, 'X_target.npy'))
         print(f"   Datos cargados (Limpios/Target): {X_clean.shape}")
@@ -26,31 +23,31 @@ def train_vae_reference():
         print(f"❌ Error cargando X_target.npy: {e}")
         return
 
-    # 2. Split Train/Val
+
     X_train, X_val = train_test_split(X_clean, test_size=0.2, random_state=42)
 
-    # 3. Construir y Compilar VAE
+
     vae = build_vae(input_len=2048)
     optimizer = Adam(learning_rate=0.0001)
 
-    # La loss ya está añadida dentro del modelo (add_loss), así que usamos loss=None
+
     vae.compile(optimizer=optimizer)
 
-    # 4. Entrenar (Input=Clean, Output=Clean implícito en la loss interna)
+
     history = vae.fit(
         X_train, X_train,
         validation_data=(X_val, X_val),
-        epochs=100, # Los VAE suelen converger rápido con datos limpios
+        epochs=100,
         batch_size=32,
         verbose=1
     )
 
-    # 5. Guardar Modelo
+
     save_path = os.path.join(PATH_MODELS, 'VAE_Reference.keras')
     vae.save(save_path)
     print(f"✅ VAE de Referencia guardado en: {save_path}")
 
-    # 6. Gráfico
+
     plt.figure(figsize=(10, 6))
     plt.plot(history.history['loss'], label='Training Loss')
     plt.plot(history.history['val_loss'], label='Validation Loss')
