@@ -25,7 +25,7 @@ def weighted_mae(y_true, y_pred):
     """
     error = tf.abs(y_true - y_pred)
 
-    weights = tf.where(y_true < 0.49, 20.0, 1.0)
+    weights = tf.where(y_true < 0.48, 20.0, 1.0)
     return tf.reduce_mean(error * weights)
 
 def train_model():
@@ -68,7 +68,7 @@ def train_model():
 
     callbacks = [
 
-        EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True, verbose=1),
+        EarlyStopping(monitor='val_loss', patience=30, restore_best_weights=True, verbose=1),
 
 
         ModelCheckpoint(MODEL_FILE, monitor='val_loss', save_best_only=True, verbose=1),

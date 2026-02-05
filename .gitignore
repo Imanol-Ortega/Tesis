@@ -22,6 +22,7 @@ dataset/
 .idea/
 .DS_Store
 Thumbs.db
+results/
 
 # --- Modelos (Opcional) ---
 # Si tus modelos pesan más de 100MB, GitHub los rechazará.

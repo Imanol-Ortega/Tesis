@@ -40,7 +40,7 @@ def train_vae_reference():
     history = vae.fit(
         X_train, X_train,
         validation_data=(X_val, X_val),
-        epochs=50, # Los VAE suelen converger rápido con datos limpios
+        epochs=100, # Los VAE suelen converger rápido con datos limpios
         batch_size=32,
         verbose=1
     )
