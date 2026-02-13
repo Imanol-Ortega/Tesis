@@ -29,7 +29,7 @@ def weighted_mae(y_true, y_pred):
     return tf.reduce_mean(error * weights)
 
 def train_model():
-    print("🚀 Iniciando Entrenamiento (Configuración Tesis Fase 2)...")
+    print("Iniciando Entrenamiento (Configuración Tesis Fase 2)...")
 
 
     if os.path.exists(MODEL_FILE):
