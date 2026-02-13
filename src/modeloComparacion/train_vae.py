@@ -18,9 +18,9 @@ def train_vae_reference():
 
     try:
         X_clean = np.load(os.path.join(PATH_DATA, 'X_target.npy'))
-        print(f"   Datos cargados (Limpios/Target): {X_clean.shape}")
+        print(f"Datos cargados (Limpios/Target): {X_clean.shape}")
     except Exception as e:
-        print(f"❌ Error cargando X_target.npy: {e}")
+        print(f"Error cargando X_target.npy: {e}")
         return
 
 
@@ -45,7 +45,7 @@ def train_vae_reference():
 
     save_path = os.path.join(PATH_MODELS, 'VAE_Reference.keras')
     vae.save(save_path)
-    print(f"✅ VAE de Referencia guardado en: {save_path}")
+    print(f"VAE de Referencia guardado en: {save_path}")
 
 
     plt.figure(figsize=(10, 6))

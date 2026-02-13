@@ -37,7 +37,7 @@ def procesar_planeta(row):
 
 
         if os.path.exists(csv_output):
-            return f"⏭️  Salteado: {planet_name}"
+            return f"Salteado: {planet_name}"
 
 
         search = lk.search_lightcurve(f"TIC {tic_id}", mission="TESS", author="SPOC", exptime=120)
@@ -54,10 +54,10 @@ def procesar_planeta(row):
             lc_collection = search[0].download(quality_bitmask='hard')
         except Exception as e:
 
-            return f"⚠️ Error descarga: {planet_name} ({str(e)})"
+            return f"Error descarga: {planet_name} ({str(e)})"
 
         if lc_collection is None:
-            return f"⚠️ Error descarga (Vacío): {planet_name}"
+            return f"Error descarga (Vacío): {planet_name}"
 
 
         fits_path = lc_collection.filename
@@ -79,7 +79,7 @@ def procesar_planeta(row):
         except:
             pass
 
-        return f"✅ {planet_name} ({csv_size:.2f} MB)"
+        return f"{planet_name} ({csv_size:.2f} MB)"
 
     except Exception as e:
         return f"🔥 Error crítico en {row.get('pl_name', 'Planeta')}: {str(e)}"

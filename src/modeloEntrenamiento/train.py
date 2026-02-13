@@ -34,12 +34,12 @@ def train_model():
 
     if os.path.exists(MODEL_FILE):
         os.remove(MODEL_FILE)
-        print("🗑️ Modelo antiguo eliminado para reiniciar entrenamiento limpio.")
+        print("Modelo antiguo eliminado para reiniciar entrenamiento limpio.")
 
     if not os.path.exists(PATH_MODELS): os.makedirs(PATH_MODELS)
 
 
-    print("📂 Cargando dataset...")
+    print("Cargando dataset...")
     try:
         X_input = np.load(os.path.join(PATH_DATA, 'X_input.npy'))
         X_target = np.load(os.path.join(PATH_DATA, 'X_target.npy'))

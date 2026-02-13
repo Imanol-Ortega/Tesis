@@ -18,7 +18,7 @@ def procesar_anomalia(row):
     try:
 
         col_tic = next((c for c in row.index if 'tic' in c.lower() or 'tid' == c.lower()), None)
-        if not col_tic: return "❌ Error: No encontré columna TIC ID"
+        if not col_tic: return "Error: No encontré columna TIC ID"
         raw_id = str(row[col_tic])
 
         clean_id_str = re.sub(r"[^0-9]", "", raw_id)
@@ -29,7 +29,7 @@ def procesar_anomalia(row):
         csv_output = os.path.join(OUTPUT_DIR, f"{safe_name}.csv")
 
         if os.path.exists(csv_output):
-            return f"⏭️  Salteado: {safe_name}"
+            return f"⏭Salteado: {safe_name}"
 
         search = lk.search_lightcurve(f"TIC {tic_id}", mission="TESS", author="SPOC", exptime=120)
 
@@ -41,7 +41,7 @@ def procesar_anomalia(row):
         try:
             lc_collection = search[0].download(download_dir=FITS_DIR, quality_bitmask='hard')
         except Exception as e:
-            return f"⚠️ Error descarga: {safe_name}"
+            return f"Error descarga: {safe_name}"
         if lc_collection is None: return None
 
         fits_path = lc_collection.filename
@@ -61,9 +61,9 @@ def procesar_anomalia(row):
                 os.remove(fits_path)
         except:
             pass
-        return f"✅ {safe_name} ({csv_size:.2f} MB)"
+        return f"{safe_name} ({csv_size:.2f} MB)"
     except Exception as e:
-        return f"🔥 Error en TIC {row.get(col_tic, '?')}: {str(e)}"
+        return f"Error en TIC {row.get(col_tic, '?')}: {str(e)}"
 def descargar_anomalias_full():
     print(f"\n>>> [ADQUISICIÓN DE ANOMALÍAS] Buscando impostores... Workers: {MAX_WORKERS}")
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -72,7 +72,7 @@ def descargar_anomalias_full():
     try:
 
         if not os.path.exists(ANOMALIES_CSV):
-            print(f"❌ ERROR CRÍTICO: No encuentro el archivo: {ANOMALIES_CSV}")
+            print(f"ERROR CRÍTICO: No encuentro el archivo: {ANOMALIES_CSV}")
             print("   -> Asegúrate de guardarlo en 'data/nea/' con el nombre 'nasa_anomalies.csv'")
             return
         df = pd.read_csv(ANOMALIES_CSV, comment='#')
@@ -85,7 +85,7 @@ def descargar_anomalias_full():
             print(f"--- Filtrando por FP/EB: Descargaremos {len(df_filtrado)} curvas anómalas ---")
             df = df_filtrado
         else:
-            print("⚠️ Advertencia: No encontré columna de disposición. Descargando TODO el archivo.")
+            print("Advertencia: No encontré columna de disposición. Descargando TODO el archivo.")
     except Exception as e:
         print(f"Error leyendo CSV: {e}")
         return

@@ -40,7 +40,7 @@ def load_metadata_anomalies():
     if not files: return None
 
     latest_file = sorted(files)[-1]
-    print(f"   📄 Usando catálogo de anomalías: {os.path.basename(latest_file)}")
+    print(f"Usando catálogo de anomalías: {os.path.basename(latest_file)}")
     try:
         df = pd.read_csv(latest_file, comment='#')
         df.columns = [c.strip().lower() for c in df.columns]
@@ -81,7 +81,7 @@ def get_params(filename, df_meta, is_anomaly=False):
     except: return None
 
 def build_test_dataset():
-    print("🧪 GENERANDO DATASET DE PRUEBA (FASE 3)...")
+    print("GENERANDO DATASET DE PRUEBA (FASE 3)...")
     os.makedirs(DIR_OUTPUT, exist_ok=True)
 
     processor = DataPreprocessor()
@@ -89,7 +89,7 @@ def build_test_dataset():
     df_anomalies = load_metadata_anomalies()
 
     if df_planets is None:
-        print("   ❌ ERROR CRÍTICO: No se pudo cargar el catálogo de metadatos (nasa_exoplanets.csv).")
+        print(" ERROR CRÍTICO: No se pudo cargar el catálogo de metadatos (nasa_exoplanets.csv).")
         return
 
     X_test = []
@@ -100,9 +100,9 @@ def build_test_dataset():
     files_planets = files_planets[-int(len(files_planets)*0.3):]
 
     if len(files_planets) == 0:
-        print("   ⚠️ ADVERTENCIA: La lista de archivos para test está vacía. Usando TODOS los archivos disponibles como fallback.")
+        print("ADVERTENCIA: La lista de archivos para test está vacía. Usando TODOS los archivos disponibles como fallback.")
         files_planets = glob.glob(os.path.join(PATH_RAW_PLANETS, "*.csv"))
-    print(f"   ℹ️ Analizando {len(files_planets)} archivos candidatos para el Test Set...")
+    print(f" Analizando {len(files_planets)} archivos candidatos para el Test Set...")
 
     count_c0 = 0
     for filepath in files_planets:
@@ -170,7 +170,7 @@ def build_test_dataset():
                     count_c1_b += 1
             except: continue
     else:
-        print("   ⚠️ No se encontró catálogo TOI. Saltando Tipo B.")
+        print("No se encontró catálogo TOI. Saltando Tipo B.")
 
     # Guardar
     X_test = np.array(X_test)[..., np.newaxis]
@@ -183,7 +183,7 @@ def build_test_dataset():
 
     np.save(os.path.join(DIR_OUTPUT, "X_test.npy"), X_test)
     np.save(os.path.join(DIR_OUTPUT, "y_test.npy"), y_test)
-    print(f"✅ Archivos guardados en {DIR_OUTPUT}")
+    print(f"Archivos guardados en {DIR_OUTPUT}")
 
 if __name__ == "__main__":
     build_test_dataset()
