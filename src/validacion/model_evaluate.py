@@ -12,7 +12,7 @@ PATH_MODEL = os.path.join(BASE_DIR, 'models', 'CAE_1D.keras')
 DIR_RESULTS = os.path.join(BASE_DIR, 'results', 'validacion_fase3')
 
 def evaluate():
-    print("⚖️  INICIANDO EVALUACIÓN DE RENDIMIENTO (FASE 3)...")
+    print("INICIANDO EVALUACIÓN DE RENDIMIENTO (FASE 3)...")
     os.makedirs(DIR_RESULTS, exist_ok=True)
 
     try:
@@ -24,9 +24,9 @@ def evaluate():
             print("   -> Baja el filtro de profundidad en 'data_builder_model.py' y regenera el dataset.")
             return
 
-        # compile=False evita errores con funciones de pérdida custom
+
         model = tf.keras.models.load_model(PATH_MODEL, compile=False)
-        print(f"✅ Datos cargados: {X_test.shape} muestras.")
+        print(f"Datos cargados: {X_test.shape} muestras.")
     except Exception as e:
         print(f"❌ Error cargando recursos: {e}")
         return
@@ -39,7 +39,7 @@ def evaluate():
     mse_scores = np.mean(np.square(X_test - reconstructions), axis=1).flatten()
 
 
-    print("📉 Calculando Curva Precision-Recall...")
+    print("Calculando Curva Precision-Recall...")
     precisions, recalls, thresholds = precision_recall_curve(y_test, mse_scores)
 
     precisions = precisions[:-1]
@@ -58,7 +58,7 @@ def evaluate():
     best_f2 = f2_scores[best_idx]
     best_f1 = f1_scores[best_idx]
 
-    print(f"\n🏆 UMBRAL ÓPTIMO (Max F2 - Prioridad Recall): {best_threshold:.6f}")
+    print(f"\nUMBRAL ÓPTIMO (Max F2 - Prioridad Recall): {best_threshold:.6f}")
     print(f"   F2-Score: {best_f2:.4f} (Usado para optimizar)")
     print(f"   F1-Score: {best_f1:.4f} (Referencia)")
 
@@ -99,7 +99,7 @@ def evaluate():
     plt.tight_layout()
     plt.savefig(os.path.join(DIR_RESULTS, 'matriz_confusion.png'))
 
-    print(f"\n✅ Reporte generado en: {DIR_RESULTS}")
+    print(f"\nReporte generado en: {DIR_RESULTS}")
     print("   - histograma_errores.png")
     print("   - curva_pr.png")
     print("   - matriz_confusion.png")
