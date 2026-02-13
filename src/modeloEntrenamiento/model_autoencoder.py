@@ -40,5 +40,5 @@ def build_autoencoder(input_len=2048):
 
     outputs = layers.Conv1D(1, 3, activation='sigmoid', padding='same', bias_initializer='zeros', name="output_layer")(x)
 
-    model = models.Model(inputs=inputs, outputs=outputs, name="CAE_1D_Anteproyecto_Robust")
+    model = models.Model(inputs=inputs, outputs=outputs, name="CAE_1D")
     return model

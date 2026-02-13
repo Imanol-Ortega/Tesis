@@ -47,7 +47,7 @@ def train_model():
         print(f"   Rango Input:  [{np.min(X_input):.3f}, {np.max(X_input):.3f}]")
         print(f"   Rango Target: [{np.min(X_target):.3f}, {np.max(X_target):.3f}]")
     except Exception as e:
-        print(f"❌ Error cargando datos: {e}")
+        print(f" Error cargando datos: {e}")
         return
 
 
