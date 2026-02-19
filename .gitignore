@@ -14,6 +14,7 @@ data/
 dataset/
 *.csv
 *.fits
+*.png
 
 
 
