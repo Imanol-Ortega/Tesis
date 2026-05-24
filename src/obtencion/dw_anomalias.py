@@ -7,7 +7,7 @@ from tqdm import tqdm
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 ANOMALIES_CSV = os.path.join(BASE_DIR, 'data', 'nea', 'anomalias', 'nasa_anomalies.csv')
 OUTPUT_DIR = os.path.join(BASE_DIR, 'data', 'mast', 'anomalies_csv')
-FITS_DIR = os.path.join(BASE_DIR, 'data', 'mast', 'fits')
+
 def procesar_anomalia(row):
     try:
         col_tic = next((c for c in row.index if 'tic' in c.lower() or 'tid' == c.lower()), None)
@@ -48,9 +48,8 @@ def procesar_anomalia(row):
     except Exception as e:
         return f"Error en TIC {row.get(col_tic, '?')}: {str(e)}"
 def descargar_anomalias_full():
-    print(f"\n>>> [ADQUISICIÓN DE ANOMALÍAS] Buscando impostores...")
+    print(f"\n>>> [ADQUISICIÓN DE ANOMALÍAS]")
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-    os.makedirs(FITS_DIR, exist_ok=True)
     warnings.filterwarnings("ignore")
     try:
         if not os.path.exists(ANOMALIES_CSV):
@@ -65,7 +64,7 @@ def descargar_anomalias_full():
             print(f"--- Filtrando por FP/EB: Descargaremos {len(df_filtrado)} curvas anómalas ---")
             df = df_filtrado
         else:
-            print("Advertencia: No encontré columna de disposición. Descargando TODO el archivo.")
+            print("Advertencia: No se encontro columna de disposición. Descargando TODO el archivo.")
     except Exception as e:
         print(f"Error leyendo CSV: {e}")
         return

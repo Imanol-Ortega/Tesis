@@ -8,7 +8,7 @@ from tqdm import tqdm
 # -- CONFIGURACIÓN ---
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 NEA_DIR = os.path.join(BASE_DIR, 'data', 'nea', 'confirmados')
-CSV_DIR = os.path.join(BASE_DIR, 'data', 'mast', 'pl_confirmados-csv')
+CSV_DIR = os.path.join(BASE_DIR, 'data', 'mast', 'pl_confirmados_csv')
 def obtener_catalogo_nea():
     archivos = glob.glob(os.path.join(NEA_DIR, "*.csv"))
     if not archivos:
