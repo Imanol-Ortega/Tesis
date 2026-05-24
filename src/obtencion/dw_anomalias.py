@@ -7,9 +7,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 ANOMALIES_CSV = os.path.join(BASE_DIR, 'data', 'nea', 'anomalias', 'TOI_2026.01.18_12.38.06.csv')
-
 OUTPUT_DIR = os.path.join(BASE_DIR, 'data', 'mast', 'anomalies_csv')
 FITS_DIR = os.path.join(BASE_DIR, 'data', 'mast', 'fits')
 

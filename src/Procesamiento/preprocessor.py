@@ -6,11 +6,12 @@ class DataPreprocessor:
         self.INPUT_LEN = 2048
     def process_curve_phase_folding(self, time, flux, P, T0, smooth=False):
         try:
-            median_val = np.nanmedian(flux) #Calcula la mediana ignorando los NaN para evitar que afecten la normalización
+            median_val = np.nanmedian(flux) #Calcula la mediana
             if median_val == 0 or np.isnan(median_val): return None #Evita la división por cero o por un valor no numérico
-            flux_norm = flux / median_val #Normaliza el flujo dividiendo por la mediana, lo que centra el flujo alrededor de 1 y reduce la influencia de valores extremos
-            phase = ((time - T0) / P) % 1 #Calcula la fase de cada punto de tiempo con respecto al período P y el tiempo de tránsito T0
-            phase[phase > 0.5] -= 1 #Ajusta la fase para que esté en el rango [-0.5, 0.5], lo que facilita la visual
+            flux_norm = flux / median_val #Normalizización
+
+            phase = ((time - T0) / P) % 1 #Plegado de Fase
+            phase[phase > 0.5] -= 1 #Corrección de Fase
 
             #Ordenamiento
             sort_idx = np.argsort(phase) #Obtiene los indices ordenados de la fase

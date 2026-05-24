@@ -183,8 +183,8 @@ plt.close()
 
 # --- GRÁFICO 4: COMPARATIVA (Con Tabla de Umbrales) ---
 print("📊 Generando Gráfico 4: Comparativa Final (Con Tabla)...")
-fig = plt.figure(figsize=(16, 5))
-gs = fig.add_gridspec(1, 3)
+fig = plt.figure(figsize=(6, 15))
+gs = fig.add_gridspec(3, 1)
 
 # SUBPLOT 1: TABLA COMPARATIVA (Reemplaza al gráfico de barras)
 ax0 = fig.add_subplot(gs[0, 0])
@@ -216,15 +216,15 @@ for i in range(3):
     if i > 0: table[(4, i)].set_text_props(weight='bold', color='#d62728') # Rojo para los números
 
 # SUBPLOT 2: Matriz CAE
-ax1 = fig.add_subplot(gs[0, 1])
+ax1 = fig.add_subplot(gs[1, 0])
 sns.heatmap(metrics_cae['cm'], annot=True, fmt='d', cmap='Blues', cbar=False, ax=ax1,
             xticklabels=['Norm', 'Anom'], yticklabels=['Norm', 'Anom'])
 ax1.set_title("CAE (Propuesto)")
 
 # SUBPLOT 3: Matriz VAE
-ax2 = fig.add_subplot(gs[0, 2])
+ax2 = fig.add_subplot(gs[2, 0])
 sns.heatmap(metrics_vae['cm'], annot=True, fmt='d', cmap='Oranges', cbar=False, ax=ax2,
-            xticklabels=['Norm', 'Anom'], yticklabels=['', ''])
+            xticklabels=['Norm', 'Anom'], yticklabels=['Norm', 'Anom'])
 ax2.set_title("VAE (Referencia)")
 
 plt.tight_layout()
