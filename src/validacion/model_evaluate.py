@@ -6,7 +6,7 @@ import os
 from sklearn.metrics import precision_recall_curve, confusion_matrix, f1_score, accuracy_score
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PATH_DATA_TEST = os.path.join(BASE_DIR, 'data', 'processed', 'test')
-PATH_MODEL = os.path.join(BASE_DIR, 'models_uniforme', 'CAE_1D.keras')
+PATH_MODEL = os.path.join(BASE_DIR, 'models', 'CAE_1D.keras')
 DIR_RESULTS = os.path.join(BASE_DIR, 'results', 'validacion_fase3')
 def evaluate():
     print("INICIANDO EVALUACIÓN DE RENDIMIENTO...")

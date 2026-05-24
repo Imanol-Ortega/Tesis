@@ -2,22 +2,22 @@ import tensorflow as tf
 import numpy as np
 import os
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 import matplotlib.pyplot as plt
 import time
+import numpy as np
 from model_autoencoder import build_autoencoder
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PATH_DATA = os.path.join(BASE_DIR, 'data', 'processed', 'entrenamiento')
 PATH_MODELS = os.path.join(BASE_DIR, 'models')
+PATH_MODELS = os.path.join(BASE_DIR, 'models_uniforme')
 MODEL_FILE = os.path.join(PATH_MODELS, 'CAE_1D.keras')
-
 # Función de pérdida personalizada
 def weighted_mae(y_true, y_pred):
     error = tf.abs(y_true - y_pred) #Error absoluto entre el valor real y el predicho
     weights = tf.where(y_true < 0.48, 20.0, 1.0) #Pesos: 20x para valores < 0.48, 1x para el resto
     return tf.reduce_mean(error * weights) # Promedio del error ponderado
-
 def train_model():
     print("Iniciando Entrenamiento")
     if os.path.exists(MODEL_FILE):
@@ -39,7 +39,6 @@ def train_model():
         random_state=42,
         shuffle=True
     )
-
     model = build_autoencoder(input_len=2048) #Construcción del modelo
     optimizer = Adam(learning_rate=0.001) #Optimizador Adam con tasa de aprendizaje de 0.001
     model.compile(optimizer=optimizer, loss=weighted_mae) #Compilación del modelo con la función de pérdida personalizada
@@ -63,9 +62,6 @@ def train_model():
     fin = time.time()
     tiempo_total = (fin - inicio) / 60
     plot_history(history,tiempo_total) #Gráfica Pérdida de entrenamiento y validación
-
-import numpy as np
-
 def plot_history(history, tiempo_total):
     loss = history.history['loss']
     val_loss = history.history['val_loss']

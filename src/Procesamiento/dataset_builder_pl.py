@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import glob
 import re
-from preprocessor import DataPreprocessor
+from src.Procesamiento.preprocessor import DataPreprocessor
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PATH_RAW = os.path.join(BASE_DIR, 'data', 'mast', 'csv')
 PATH_META = os.path.join(BASE_DIR, 'data', 'nea', 'confirmados', 'nasa_exoplanets.csv')

@@ -10,7 +10,7 @@ import sys
 BASE_DIR_SRC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR_SRC)
 
-from Procesamiento.preprocessor import DataPreprocessor
+from src.Procesamiento.preprocessor import DataPreprocessor
 
 BASE_DIR = os.path.dirname(BASE_DIR_SRC)
 PATH_RAW_PLANETS = os.path.join(BASE_DIR, 'data', 'mast', 'csv')
