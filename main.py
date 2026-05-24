@@ -4,6 +4,17 @@ import sys
 # --- IMPORTACIONES ---
 from src.obtencion import dw_pl_confirmados
 from src.obtencion import dw_anomalias
+from src.Procesamiento import dataset_builder_pl
+from src.Procesamiento import dataset_builder_an
+from src.modeloEntrenamiento import train
+from src.modeloComparacion import train_vae
+from src.validacion import model_evaluate
+from src.modeloComparacion import compare_models
+from src.test import pruebas
+# Se importa el módulo de reportes (asumiendo que está en el path o carpeta raíz)
+try: from pruebas import reportes_tesis
+except ImportError: reportes_tesis = None
+
 def main():
     parser = argparse.ArgumentParser(description="Pipeline de Tesis: Detección de Anomalías en Exoplanetas")
     parser.add_argument('--step', type=str, required=True,
@@ -25,35 +36,29 @@ def main():
             dw_pl_confirmados.descargar_curvas()
     elif args.step == 'preprocess':
         print("\nMODO: Preprocesamiento y Creación de Dataset")
-        from src.Procesamiento import dataset_builder_pl
         dataset_builder_pl.build_dataset()
     elif args.step == 'preprocess-test':
         print("\nMODO: Preprocesamiento - Dataset de Prueba (Anomalías y Errores)")
-        from src.Procesamiento import dataset_builder_an
         dataset_builder_an.build_test_dataset()
     elif args.step == 'train':
         print("\nMODO: Entrenamiento del Modelo Convolutional Autoencoder")
-        from src.modeloEntrenamiento import train
         train.train_model()
     elif args.step == 'train-vae':
         print("\nMODO: Entrenamiento del VAE de Referencia (Hönes et al.)")
-        from src.modeloComparacion import train_vae
         train_vae.train_vae_reference()
     elif args.step == 'evaluate':
         print("\nMODO: Evaluación de Rendimiento y Cálculo de Umbral")
-        from src.validacion import model_evaluate
         model_evaluate.evaluate()
     elif args.step == 'compare':
         print("\nMODO: Análisis Comparativo (CAE vs VAE)")
-        from src.modeloComparacion import compare_models
         compare_models.compare()
     elif args.step == 'visual':
         print("\nMODO: Inspección Visual de Reconstrucciones")
-        from src.test import pruebas
         pruebas.check_visual()
     elif args.step == 'report':
         print("\nMODO: Generación de Reportes y Gráficas de Tesis")
-        from pruebas import reportes_tesis
+        if reportes_tesis is None:
+            print("Error: El módulo 'reportes_tesis' no pudo ser cargado.")
 
 if __name__ == "__main__":
     main()
