@@ -92,9 +92,9 @@ def build_dataset():
                     time, flux, P_real + noise_p, T0_real + noise_t0, smooth=False
                 )
 
-                if curve_input is not None and curve_target is not None:
-                    X_input.append(curve_input)
-                    X_target.append(curve_target)
+            if curve_input is not None and curve_target is not None:
+                X_input.append(curve_input)
+                X_target.append(curve_target)
 
             processed_count += 1
             print(f"Procesados: {processed_count}...", end='\r')
