@@ -84,7 +84,7 @@ def build_test_dataset():
             flux = df.iloc[:, 0].values # Asume que la segunda columna es tiempo
             median_val = np.nanmedian(flux) #Calcula la mediana ignorando los NaN para evitar que afecten la normalización
             if median_val > 0: # Evita división por cero o valores no numéricos
-                depth = 1.0 - (np.min(flux) / median_val) # Calcula la profundidad del tránsito como la caída relativa al valor mediano
+                depth = 1.0 - (np.nanmin(flux) / median_val) # Calcula la profundidad del tránsito como la caída relativa al valor mediano
                 if depth < 0.005: # Filtra tránsitos muy superficiales que podrían no ser detectables
                     continue # Si la profundidad es menor al umbral, se considera que no hay un tránsito claro
             curve = processor.process_curve_phase_folding(time, flux, P, T0, smooth=False) # Procesa la curva sin suavizado para la clase de prueba
@@ -100,7 +100,9 @@ def build_test_dataset():
                 if curve_bad is not None:
                     X_test.append(curve_bad) # Agrega la curva mal plegada a los datos de prueba
                     y_test.append(1) # Etiqueta 1 para curvas mal plegadas (clase anómala)
-        except: continue
+        except Exception as e:
+            print(f"Error procesando {filepath}: {e}")
+            continue
     print("   [2/4] Generando Clase 0 (Ruido Estelar Plano)...")
     for _ in range(count_c0 // 2): # Genera una cantidad de curvas de ruido plano igual a la mitad de las muestras de clase 0 para mantener un balance razonable
         noise = np.random.normal(0, 0.005, 2048) # Ruido gaussiano con media 0 y desviación estándar de 0.005 para simular variabilidad estelar leve

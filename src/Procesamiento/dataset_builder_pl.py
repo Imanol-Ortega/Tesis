@@ -99,6 +99,7 @@ def build_dataset():
             processed_count += 1
             print(f"Procesados: {processed_count}...", end='\r')
         except Exception as e:
+            print(f"\nError inesperado en {filename}: {e}")
             skipped_count += 1
             continue
     print(f"\nFinalizado: {processed_count} procesados, {skipped_count} saltados.")
