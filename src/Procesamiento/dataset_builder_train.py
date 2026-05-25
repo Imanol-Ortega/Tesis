@@ -31,6 +31,7 @@ def get_params_from_filename(filename, df_meta):
     clean_target = re.sub(r'[\s_\-]', '', clean_filename).lower()
     row = df_meta[df_meta['clean_name'] == clean_target]
     if row.empty:
+        print(f"\n[Aviso] {filename} no encontrado en el catálogo NASA.")
         return None
     try:
         P = float(row.iloc[0]['pl_orbper'])
@@ -39,6 +40,7 @@ def get_params_from_filename(filename, df_meta):
         elif 'pl_orbtper' in row.columns:
             T0 = float(row.iloc[0]['pl_orbtper'])
         else:
+            print(f"\n[Aviso] {filename} no tiene T0 (Epoch) definido.")
             return None
         return P, T0
     except:
@@ -71,6 +73,7 @@ def build_dataset():
             col_t = next((c for c in df_lc.columns if c.lower() in ['time', 'bjd', 'timecorr']), None)
             col_f = next((c for c in df_lc.columns if c.lower() in ['flux', 'pdcsap_flux', 'sap_flux']), None)
             if not col_t or not col_f:
+                print(f"\n[Aviso] {filename} carece de columnas de tiempo/flujo válidas.")
                 skipped_count += 1
                 continue
             time = df_lc[col_t].values
@@ -81,20 +84,24 @@ def build_dataset():
                 time, flux, P_real, T0_real, smooth=True
             )
 
-            for _ in range(5): #Generamos 5 muestras por curva con ruido
-                sigma_p = P_real * KP # error proporcional al período
-                sigma_t0 = T0_real * KTO # error proporcional a la epoca del tránsito
-                # distribucion gaussiana centrada en 0 con la desviacion calculada de cada error
-                noise_p = np.random.normal(0, sigma_p)
-                noise_t0 = np.random.normal(0, sigma_t0)
-                # Generamos la curva de entrada con los parámetros ruidosos
-                curve_input = processor.process_curve_phase_folding(
-                    time, flux, P_real + noise_p, T0_real + noise_t0, smooth=False
-                )
+            if curve_target is not None:
+                for _ in range(SAMPLES_PER_CURVE): #Generamos muestras por curva con ruido
+                    sigma_p = P_real * KP
+                    sigma_t0 = T0_real * KTO
 
-            if curve_input is not None and curve_target is not None:
-                X_input.append(curve_input)
-                X_target.append(curve_target)
+                    noise_p = np.random.normal(0, sigma_p)
+                    noise_t0 = np.random.normal(0, sigma_t0)
+
+                    curve_input = processor.process_curve_phase_folding(
+                        time, flux, P_real + noise_p, T0_real + noise_t0, smooth=False
+                    )
+
+                    if curve_input is not None:
+                        X_input.append(curve_input)
+                        X_target.append(curve_target)
+            else:
+                skipped_count += 1
+                continue
 
             processed_count += 1
             print(f"Procesados: {processed_count}...", end='\r')

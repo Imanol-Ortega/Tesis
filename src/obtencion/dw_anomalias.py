@@ -26,7 +26,7 @@ def procesar_anomalia(row):
         if len(search) == 0:
             return None
         try:
-            lc_collection = search[0].download(download_dir=FITS_DIR, quality_bitmask='hard')
+            lc_collection = search[0].download(quality_bitmask='hard')
         except Exception as e:
             return f"Error descarga: {safe_name}"
         if lc_collection is None: return None
