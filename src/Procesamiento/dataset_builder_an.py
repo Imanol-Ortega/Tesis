@@ -93,13 +93,13 @@ def build_test_dataset():
                 y_test.append(0) # Etiqueta 0 para planetas confirmados (clase normal)
                 count_c0 += 1 # Contador de muestras de clase 0
 
-                print("   [4/4] Procesando Clase 1 (Error Extremo)...")
-                P_bad = P * (1 + np.random.choice([1, -1]) * KP_EXTREME) #  Genera un período ruidoso con un error extremo
-                T0_bad = T0 * (1 + np.random.choice([1, -1]) * KT_EXTREME) # Genera una época de tránsito ruidosa con un error
-                curve_bad = processor.process_curve_phase_folding(time, flux, P_bad, T0_bad, smooth=False) # Procesa la curva con los parámetros ruidosos para simular un mal plegado
-                if curve_bad is not None:
-                    X_test.append(curve_bad) # Agrega la curva mal plegada a los datos de prueba
-                    y_test.append(1) # Etiqueta 1 para curvas mal plegadas (clase anómala)
+            print("   [4/4] Procesando Clase 1 (Error Extremo)...")
+            P_bad = P * (1 + np.random.choice([1, -1]) * KP_EXTREME) #  Genera un período ruidoso con un error extremo
+            T0_bad = T0 * (1 + np.random.choice([1, -1]) * KT_EXTREME) # Genera una época de tránsito ruidosa con un error
+            curve_bad = processor.process_curve_phase_folding(time, flux, P_bad, T0_bad, smooth=False) # Procesa la curva con los parámetros ruidosos para simular un mal plegado
+            if curve_bad is not None:
+                X_test.append(curve_bad) # Agrega la curva mal plegada a los datos de prueba
+                y_test.append(1) # Etiqueta 1 para curvas mal plegadas (clase anómala)
         except Exception as e:
             print(f"Error procesando {filepath}: {e}")
             continue

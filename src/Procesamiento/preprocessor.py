@@ -9,17 +9,14 @@ class DataPreprocessor:
             median_val = np.nanmedian(flux) #Calcula la mediana
             if median_val == 0 or np.isnan(median_val): return None #Evita la división por cero o por un valor no numérico
             flux_norm = flux / median_val #Normalizización
-
             phase = ((time - T0) / P) % 1 #Plegado de Fase
             phase[phase > 0.5] -= 1 #Corrección de Fase
-
             #Ordenamiento
             sort_idx = np.argsort(phase) #Obtiene los indices ordenados de la fase
             phase_sorted = phase[sort_idx] #Ordena el vector de fase
             flux_sorted = flux_norm[sort_idx] #Reordena el flujo igual que la fase
             #Limpieza de Datos
             flux_sorted = np.nan_to_num(flux_sorted, nan=1.0) #Reemplaza los NaN por 1.0
-
             if smooth: #Suavizado aplicado solo a la curva objetivo
                 flux_sorted = medfilt(flux_sorted, kernel_size=51)
 
