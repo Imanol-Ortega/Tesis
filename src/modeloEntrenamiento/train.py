@@ -93,7 +93,9 @@ def plot_history(history, tiempo_total):
     plt.ylabel('Pérdida')
     plt.grid(True, linestyle='--', alpha=0.6)
     # Guardar gráfico
-    output_path = os.path.join(BASE_DIR, 'results', 'training_history.png')
+    output_dir = os.path.join(BASE_DIR, 'graficos', 'resultado_entrenamiento')
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, 'training_history.png')
     plt.savefig(output_path)
     plt.show()
 if __name__ == "__main__":

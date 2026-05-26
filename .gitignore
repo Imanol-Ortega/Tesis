@@ -8,10 +8,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# --- Datos (MUY IMPORTANTE PARA TU TESIS) ---
 # Ignoramos la carpeta data para no subir gigas de curvas de luz
 data/
 dataset/
+models/
+models_uniforme/
 *.csv
 *.fits
 *.png

@@ -6,7 +6,7 @@ from sklearn.metrics import precision_recall_curve, confusion_matrix, f1_score
 import matplotlib.pyplot as plt
 def weighted_mae(y_true, y_pred):
     error = tf.abs(y_true - y_pred)
-    weights = tf.where(y_true < 0.49, 20.0, 1.0)
+    weights = tf.where(y_true < 0.48, 20.0, 1.0)
     return tf.reduce_mean(error * weights)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PATH_TEST_X = os.path.join(BASE_DIR, 'data', 'processed', 'test', 'X_test.npy')
