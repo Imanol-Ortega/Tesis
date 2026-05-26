@@ -4,7 +4,7 @@ import os
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.optimizers import Adam
 import matplotlib.pyplot as plt
-from model_vae import build_vae
+from src.modeloComparacion.model_vae import build_vae
 
 # Rutas ajustadas a tu estructura
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -56,7 +56,10 @@ def train_vae_reference():
     plt.ylabel('Loss (MSE + KL)')
     plt.legend()
     plt.grid()
-    output_plot = os.path.join(BASE_DIR, 'results', 'vae_training_history.png')
+
+    plots_dir = os.path.join(BASE_DIR, 'graficos', 'entrenamiento_vae')
+    os.makedirs(plots_dir, exist_ok=True)
+    output_plot = os.path.join(plots_dir, 'vae_training_history.png')
     plt.savefig(output_plot)
     print(f"📈 Gráfico guardado en {output_plot}")
 

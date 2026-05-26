@@ -35,7 +35,7 @@ def main():
         print("\nMODO: Entrenamiento del Modelo Convolutional Autoencoder")
         train.train_model()
     elif args.step == 'train-vae':
-        from src.modeloEntrenamiento import train_vae
+        from src.modeloComparacion import train_vae
         print("\nMODO: Entrenamiento del VAE de Referencia (Hönes et al.)")
         train_vae.train_vae_reference()
     elif args.step == 'evaluate-model-cae':
@@ -43,11 +43,11 @@ def main():
         print("\nMODO: Evaluación de Rendimiento y Cálculo de Umbral")
         model_evaluate.evaluate()
     elif args.step == 'compare-models':
-        from src.validacion import compare_models
+        from pruebas import reportes_tesis
         print("\nMODO: Análisis Comparativo (CAE vs VAE)")
-        compare_models.compare()
+        reportes_tesis.generar_reporte()
     elif args.step == 'visual-reconstructions':
-        from src.validacion import pruebas
+        from src.test import pruebas
         print("\nMODO: Inspección Visual de Reconstrucciones")
         pruebas.check_visual()
 

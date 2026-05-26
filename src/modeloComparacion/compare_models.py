@@ -13,7 +13,7 @@ PATH_TEST_X = os.path.join(BASE_DIR, 'data', 'processed', 'test', 'X_test.npy')
 PATH_TEST_Y = os.path.join(BASE_DIR, 'data', 'processed', 'test', 'y_test.npy')
 PATH_CAE = os.path.join(BASE_DIR, 'models', 'CAE_1D.keras')
 PATH_VAE = os.path.join(BASE_DIR, 'models', 'VAE_Reference.keras')
-DIR_RESULTS = os.path.join(BASE_DIR, 'results')
+DIR_RESULTS = os.path.join(BASE_DIR, 'graficos', 'comparativa_modelos')
 def get_best_metrics(y_true, mse_scores):
     """Calcula umbral óptimo F1 y devuelve métricas"""
     precisions, recalls, thresholds = precision_recall_curve(y_true, mse_scores)
@@ -87,6 +87,7 @@ def compare():
     print("=============================================")
     print(df.to_string(index=False))
     print("=============================================")
+    os.makedirs(DIR_RESULTS, exist_ok=True)
     csv_path = os.path.join(DIR_RESULTS, 'comparative_analysis.csv')
     df.to_csv(csv_path, index=False)
     print(f"   -> Guardado en {csv_path}")

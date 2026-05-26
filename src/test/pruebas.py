@@ -8,7 +8,7 @@ import random
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PATH_DATA = os.path.join(BASE_DIR, 'data', 'processed', 'entrenamiento')
 PATH_MODEL = os.path.join(BASE_DIR, 'models', 'CAE_1D.keras')
-DIR_RESULTS = os.path.join(BASE_DIR, 'results')
+DIR_RESULTS = os.path.join(BASE_DIR, 'graficos', 'inspeccion_visual')
 
 def check_visual():
     print("🔍 Iniciando Inspección Visual del Modelo...")

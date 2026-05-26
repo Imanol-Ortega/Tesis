@@ -17,7 +17,7 @@ PATH_RAW_PLANETS = os.path.join(BASE_DIR, 'data', 'mast', 'csv')
 PATH_RAW_ANOMALIES = os.path.join(BASE_DIR, 'data', 'mast', 'anomalies_csv')
 PATH_META_PLANETS = os.path.join(BASE_DIR, 'data', 'nea', 'confirmados', 'nasa_exoplanets.csv')
 PATH_META_ANOMALIES_DIR = os.path.join(BASE_DIR, 'data', 'nea', 'anomalias')
-DIR_RESULTS = os.path.join(BASE_DIR, 'results', 'validacion_fase3')
+DIR_RESULTS = os.path.join(BASE_DIR, 'graficos', 'ejemplos_clases')
 
 KP_EXTREME = 0.10
 KT_EXTREME = 0.05

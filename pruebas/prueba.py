@@ -7,6 +7,7 @@ from src.Procesamiento.preprocessor import DataPreprocessor
 # ================= CONFIGURACIÓN =================
 FILE_NEA = os.path.join('data', 'nea', 'confirmados', 'nasa_exoplanets.csv')
 DIR_MAST = os.path.join('data', 'mast', 'csv')
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def buscar_mejor_u():
     pp = DataPreprocessor()
@@ -68,7 +69,10 @@ def graficar_resultado(d):
     plt.xlim(-0.15, 0.15)
     plt.ylim(-0.1, 1.1)
     plt.legend()
-    plt.savefig("figura_tesis_ganadora.png", dpi=300)
+    plots_dir = os.path.join(BASE_DIR, 'graficos', 'busqueda_mejor_u')
+    os.makedirs(plots_dir, exist_ok=True)
+    save_path = os.path.join(plots_dir, "figura_tesis_ganadora.png")
+    plt.savefig(save_path, dpi=300)
     plt.show()
 
 if __name__ == "__main__":

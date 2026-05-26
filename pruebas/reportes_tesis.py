@@ -10,11 +10,11 @@ from tensorflow.keras import layers, models, backend as K
 # ==========================================
 # 1. CONFIGURACIÓN Y RUTAS
 # ==========================================
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PATH_DATA_TRAIN = os.path.join(BASE_DIR, 'data', 'processed', 'entrenamiento')
 PATH_DATA_TEST_X = os.path.join(BASE_DIR, 'data', 'processed', 'test', 'X_test.npy')
 PATH_DATA_TEST_Y = os.path.join(BASE_DIR, 'data', 'processed', 'test', 'y_test.npy')
-PATH_RESULTS = os.path.join(BASE_DIR, 'results')
+PATH_RESULTS = os.path.join(BASE_DIR, 'graficos', 'reporte_final')
 
 PATH_MODEL_CAE = os.path.join(BASE_DIR, 'models', 'CAE_1D.keras')
 PATH_MODEL_VAE = os.path.join(BASE_DIR, 'models', 'VAE_Reference.keras')
@@ -62,173 +62,177 @@ def get_best_metrics(y_true, mse_scores):
         'thresh': thresholds[best_idx], 'cm': cm, 'curve_p': precisions, 'curve_r': recalls
     }
 
-# ==========================================
-# 4. CARGA
-# ==========================================
-print("📂 Cargando datos...")
-X_input_train = np.load(os.path.join(PATH_DATA_TRAIN, 'X_input.npy'))
-X_target_train = np.load(os.path.join(PATH_DATA_TRAIN, 'X_target.npy'))
-X_test = np.load(PATH_DATA_TEST_X)
-y_test = np.load(PATH_DATA_TEST_Y)
+def generar_reporte():
+    # ==========================================
+    # 4. CARGA
+    # ==========================================
+    print("📂 Cargando datos...")
+    X_input_train = np.load(os.path.join(PATH_DATA_TRAIN, 'X_input.npy'))
+    X_target_train = np.load(os.path.join(PATH_DATA_TRAIN, 'X_target.npy'))
+    X_test = np.load(PATH_DATA_TEST_X)
+    y_test = np.load(PATH_DATA_TEST_Y)
 
-print("🤖 Cargando modelos...")
-try:
-    cae = tf.keras.models.load_model(PATH_MODEL_CAE, custom_objects={'weighted_mae': weighted_mae})
-except:
-    cae = tf.keras.models.load_model(PATH_MODEL_CAE, compile=False)
+    print("🤖 Cargando modelos...")
+    try:
+        cae = tf.keras.models.load_model(PATH_MODEL_CAE, custom_objects={'weighted_mae': weighted_mae})
+    except:
+        cae = tf.keras.models.load_model(PATH_MODEL_CAE, compile=False)
 
-try:
-    vae = tf.keras.models.load_model(PATH_MODEL_VAE, custom_objects={'Sampling': Sampling, 'VAELossLayer': VAELossLayer}, compile=False)
-except:
-    print("❌ Error cargando VAE.")
-    exit()
+    try:
+        vae = tf.keras.models.load_model(PATH_MODEL_VAE, custom_objects={'Sampling': Sampling, 'VAELossLayer': VAELossLayer}, compile=False)
+    except:
+        print("❌ Error cargando VAE.")
+        return
 
-# ==========================================
-# 5. GENERACIÓN DE GRÁFICOS
-# ==========================================
+    # ==========================================
+    # 5. GENERACIÓN DE GRÁFICOS
+    # ==========================================
 
-# --- GRÁFICO 1: DATOS (Búsqueda Inteligente) ---
-print("📊 Generando Gráfico 1: Datos...")
-best_idx = 0
-found_nice = False
-candidates = [2021, 3012, 1760, 2332]
-for idx in candidates:
-    if idx < len(X_target_train) and np.min(X_target_train[idx]) < 0.45:
-        best_idx = idx
-        found_nice = True
-        break
-if not found_nice:
-    for i in range(len(X_target_train)):
-        if np.min(X_target_train[i]) < 0.46 and np.std(X_target_train[i]) < 0.02:
-            best_idx = i
+    # --- GRÁFICO 1: DATOS (Búsqueda Inteligente) ---
+    print("📊 Generando Gráfico 1: Datos...")
+    best_idx = 0
+    found_nice = False
+    candidates = [2021, 3012, 1760, 2332]
+    for idx in candidates:
+        if idx < len(X_target_train) and np.min(X_target_train[idx]) < 0.45:
+            best_idx = idx
+            found_nice = True
             break
+    if not found_nice:
+        for i in range(len(X_target_train)):
+            if np.min(X_target_train[i]) < 0.46 and np.std(X_target_train[i]) < 0.02:
+                best_idx = i
+                break
 
-plt.figure(figsize=(10, 7))
-plt.subplot(2, 1, 1)
-plt.plot(X_target_train[best_idx], color='#2ca02c', linewidth=2, label='Target (Ideal)')
-plt.title(f"A. Curva de Luz Original Plegada (Muestra #{best_idx})", fontweight='bold')
-plt.ylabel("Flujo")
-plt.ylim(0.3, 0.6)
-plt.legend(loc='lower right')
-plt.grid(True, alpha=0.3)
-
-plt.subplot(2, 1, 2)
-plt.plot(X_input_train[best_idx], color='#d62728', alpha=0.6, linewidth=0.8, label='Input (Ruidoso)')
-plt.plot(X_target_train[best_idx], color='#2ca02c', linestyle='--', linewidth=1.5, alpha=0.8, label='Referencia')
-plt.title("B. Curva de Luz con Ruido (Input)", fontweight='bold')
-plt.xlabel("Fase")
-plt.ylabel("Flujo")
-plt.ylim(0.3, 0.6)
-plt.legend(loc='lower right')
-plt.tight_layout()
-plt.savefig(os.path.join(PATH_RESULTS, '1_datos_original_vs_aumentado.png'), dpi=300)
-plt.close()
-
-
-# --- GRÁFICO 2: RECONSTRUCCIÓN ---
-print("📊 Generando Gráfico 2: Reconstrucción...")
-indices_plot = [best_idx, 1760, 3012]
-indices_plot = [i for i in indices_plot if i < len(X_input_train)]
-if len(indices_plot) < 3: indices_plot = [best_idx, best_idx+1, best_idx+2]
-samples = X_input_train[indices_plot]
-targets = X_target_train[indices_plot]
-reconstructions = cae.predict(samples, verbose=0)
-
-plt.figure(figsize=(10, 9))
-for i, idx in enumerate(indices_plot):
-    plt.subplot(3, 1, i+1)
-    plt.plot(samples[i], color='red', alpha=0.25, label='Input')
-    plt.plot(targets[i], color='green', linestyle='--', linewidth=1.5, label='Target')
-    plt.plot(reconstructions[i], color='blue', linewidth=2, label='CAE')
-    plt.title(f"Reconstrucción Muestra #{idx}")
+    plt.figure(figsize=(10, 7))
+    plt.subplot(2, 1, 1)
+    plt.plot(X_target_train[best_idx], color='#2ca02c', linewidth=2, label='Target (Ideal)')
+    plt.title(f"A. Curva de Luz Original Plegada (Muestra #{best_idx})", fontweight='bold')
     plt.ylabel("Flujo")
-    plt.ylim(0.3, 0.65)
-    if i == 0: plt.legend(loc='lower right')
-plt.tight_layout()
-plt.savefig(os.path.join(PATH_RESULTS, '2_reconstruccion_cae.png'), dpi=300)
-plt.close()
+    plt.ylim(0.3, 0.6)
+    plt.legend(loc='lower right')
+    plt.grid(True, alpha=0.3)
+
+    plt.subplot(2, 1, 2)
+    plt.plot(X_input_train[best_idx], color='#d62728', alpha=0.6, linewidth=0.8, label='Input (Ruidoso)')
+    plt.plot(X_target_train[best_idx], color='#2ca02c', linestyle='--', linewidth=1.5, alpha=0.8, label='Referencia')
+    plt.title("B. Curva de Luz con Ruido (Input)", fontweight='bold')
+    plt.xlabel("Fase")
+    plt.ylabel("Flujo")
+    plt.ylim(0.3, 0.6)
+    plt.legend(loc='lower right')
+    plt.tight_layout()
+    plt.savefig(os.path.join(PATH_RESULTS, '1_datos_original_vs_aumentado.png'), dpi=300)
+    plt.close()
 
 
-# --- CÁLCULO MÉTRICAS ---
-print("⚙️ Calculando métricas...")
-rec_cae = cae.predict(X_test, verbose=0)
-mse_cae = np.mean(np.square(X_test - rec_cae), axis=(1, 2))
-metrics_cae = get_best_metrics(y_test, mse_cae)
+    # --- GRÁFICO 2: RECONSTRUCCIÓN ---
+    print("📊 Generando Gráfico 2: Reconstrucción...")
+    indices_plot = [best_idx, 1760, 3012]
+    indices_plot = [i for i in indices_plot if i < len(X_input_train)]
+    if len(indices_plot) < 3: indices_plot = [best_idx, best_idx+1, best_idx+2]
+    samples = X_input_train[indices_plot]
+    targets = X_target_train[indices_plot]
+    reconstructions = cae.predict(samples, verbose=0)
 
-rec_vae = vae.predict(X_test, verbose=0)
-mse_vae = np.mean(np.square(X_test - rec_vae), axis=(1, 2))
-metrics_vae = get_best_metrics(y_test, mse_vae)
-
-
-# --- GRÁFICO 3: DETALLE CAE ---
-print("📊 Generando Gráfico 3: Métricas CAE...")
-plt.figure(figsize=(14, 6))
-plt.subplot(1, 2, 1)
-plt.plot(metrics_cae['curve_r'], metrics_cae['curve_p'], label=f'CAE (F1={metrics_cae["f1"]:.3f})', linewidth=2)
-plt.scatter(metrics_cae['rec'], metrics_cae['prec'], color='red', s=100, label='Punto Óptimo', zorder=5)
-plt.title(f"Curva Precision-Recall (CAE)\nUmbral MSE: {metrics_cae['thresh']:.6f}")
-plt.xlabel("Recall")
-plt.ylabel("Precision")
-plt.legend()
-plt.grid(True, alpha=0.3)
-
-plt.subplot(1, 2, 2)
-sns.heatmap(metrics_cae['cm'], annot=True, fmt='d', cmap='Blues', cbar=False,
-            xticklabels=['Pred: Normal', 'Pred: Anómalo'], yticklabels=['Real: Normal', 'Real: Anómalo'])
-plt.title(f"Matriz de Confusión CAE\nF1-Score: {metrics_cae['f1']:.4f}")
-plt.tight_layout()
-plt.savefig(os.path.join(PATH_RESULTS, '3_metricas_cae_detalle.png'), dpi=300)
-plt.close()
+    plt.figure(figsize=(10, 9))
+    for i, idx in enumerate(indices_plot):
+        plt.subplot(3, 1, i+1)
+        plt.plot(samples[i], color='red', alpha=0.25, label='Input')
+        plt.plot(targets[i], color='green', linestyle='--', linewidth=1.5, label='Target')
+        plt.plot(reconstructions[i], color='blue', linewidth=2, label='CAE')
+        plt.title(f"Reconstrucción Muestra #{idx}")
+        plt.ylabel("Flujo")
+        plt.ylim(0.3, 0.65)
+        if i == 0: plt.legend(loc='lower right')
+    plt.tight_layout()
+    plt.savefig(os.path.join(PATH_RESULTS, '2_reconstruccion_cae.png'), dpi=300)
+    plt.close()
 
 
-# --- GRÁFICO 4: COMPARATIVA (Con Tabla de Umbrales) ---
-print("📊 Generando Gráfico 4: Comparativa Final (Con Tabla)...")
-fig = plt.figure(figsize=(6, 15))
-gs = fig.add_gridspec(3, 1)
+    # --- CÁLCULO MÉTRICAS ---
+    print("⚙️ Calculando métricas...")
+    rec_cae = cae.predict(X_test, verbose=0)
+    mse_cae = np.mean(np.square(X_test - rec_cae), axis=(1, 2))
+    metrics_cae = get_best_metrics(y_test, mse_cae)
 
-# SUBPLOT 1: TABLA COMPARATIVA (Reemplaza al gráfico de barras)
-ax0 = fig.add_subplot(gs[0, 0])
-ax0.axis('off') # Ocultar ejes
-ax0.set_title("Tabla Comparativa de Rendimiento", fontweight='bold', pad=20)
+    rec_vae = vae.predict(X_test, verbose=0)
+    mse_vae = np.mean(np.square(X_test - rec_vae), axis=(1, 2))
+    metrics_vae = get_best_metrics(y_test, mse_vae)
 
-# Datos de la tabla
-table_data = [
-    ["Métrica", "CAE (Propuesto)", "VAE (Referencia)"],
-    ["F1-Score", f"{metrics_cae['f1']:.4f}", f"{metrics_vae['f1']:.4f}"],
-    ["Sensibilidad (Recall)", f"{metrics_cae['rec']:.4f}", f"{metrics_vae['rec']:.4f}"],
-    ["Precisión", f"{metrics_cae['prec']:.4f}", f"{metrics_vae['prec']:.4f}"],
-    ["Umbral MSE", f"{metrics_cae['thresh']:.6f}", f"{metrics_vae['thresh']:.6f}"]
-]
 
-# Crear tabla visual
-table = ax0.table(cellText=table_data, loc='center', cellLoc='center', bbox=[0, 0, 1, 1])
-table.auto_set_font_size(False)
-table.set_fontsize(11)
-table.scale(1, 2) # Escalar altura de filas
+    # --- GRÁFICO 3: DETALLE CAE ---
+    print("📊 Generando Gráfico 3: Métricas CAE...")
+    plt.figure(figsize=(14, 6))
+    plt.subplot(1, 2, 1)
+    plt.plot(metrics_cae['curve_r'], metrics_cae['curve_p'], label=f'CAE (F1={metrics_cae["f1"]:.3f})', linewidth=2)
+    plt.scatter(metrics_cae['rec'], metrics_cae['prec'], color='red', s=100, label='Punto Óptimo', zorder=5)
+    plt.title(f"Curva Precision-Recall (CAE)\nUmbral MSE: {metrics_cae['thresh']:.6f}")
+    plt.xlabel("Recall")
+    plt.ylabel("Precision")
+    plt.legend()
+    plt.grid(True, alpha=0.3)
 
-# Colorear encabezados
-for i in range(3):
-    table[(0, i)].set_facecolor('#40466e') # Azul oscuro
-    table[(0, i)].set_text_props(color='white', weight='bold')
-# Resaltar fila de Umbral (la última)
-for i in range(3):
-    table[(4, i)].set_facecolor('#f0f0f0') # Gris claro para destacar diferencia
-    if i > 0: table[(4, i)].set_text_props(weight='bold', color='#d62728') # Rojo para los números
+    plt.subplot(1, 2, 2)
+    sns.heatmap(metrics_cae['cm'], annot=True, fmt='d', cmap='Blues', cbar=False,
+                xticklabels=['Pred: Normal', 'Pred: Anómalo'], yticklabels=['Real: Normal', 'Real: Anómalo'])
+    plt.title(f"Matriz de Confusión CAE\nF1-Score: {metrics_cae['f1']:.4f}")
+    plt.tight_layout()
+    plt.savefig(os.path.join(PATH_RESULTS, '3_metricas_cae_detalle.png'), dpi=300)
+    plt.close()
 
-# SUBPLOT 2: Matriz CAE
-ax1 = fig.add_subplot(gs[1, 0])
-sns.heatmap(metrics_cae['cm'], annot=True, fmt='d', cmap='Blues', cbar=False, ax=ax1,
-            xticklabels=['Norm', 'Anom'], yticklabels=['Norm', 'Anom'])
-ax1.set_title("CAE (Propuesto)")
 
-# SUBPLOT 3: Matriz VAE
-ax2 = fig.add_subplot(gs[2, 0])
-sns.heatmap(metrics_vae['cm'], annot=True, fmt='d', cmap='Oranges', cbar=False, ax=ax2,
-            xticklabels=['Norm', 'Anom'], yticklabels=['Norm', 'Anom'])
-ax2.set_title("VAE (Referencia)")
+    # --- GRÁFICO 4: COMPARATIVA (Con Tabla de Umbrales) ---
+    print("📊 Generando Gráfico 4: Comparativa Final (Con Tabla)...")
+    fig = plt.figure(figsize=(6, 15))
+    gs = fig.add_gridspec(3, 1)
 
-plt.tight_layout()
-plt.savefig(os.path.join(PATH_RESULTS, '4_comparativa_final.png'), dpi=300)
-plt.close()
+    # SUBPLOT 1: TABLA COMPARATIVA (Reemplaza al gráfico de barras)
+    ax0 = fig.add_subplot(gs[0, 0])
+    ax0.axis('off') # Ocultar ejes
+    ax0.set_title("Tabla Comparativa de Rendimiento", fontweight='bold', pad=20)
 
-print("\n✅ ¡Reporte Generado! Revisa la imagen '4_comparativa_final.png' para ver los umbrales.")
+    # Datos de la tabla
+    table_data = [
+        ["Métrica", "CAE (Propuesto)", "VAE (Referencia)"],
+        ["F1-Score", f"{metrics_cae['f1']:.4f}", f"{metrics_vae['f1']:.4f}"],
+        ["Sensibilidad (Recall)", f"{metrics_cae['rec']:.4f}", f"{metrics_vae['rec']:.4f}"],
+        ["Precisión", f"{metrics_cae['prec']:.4f}", f"{metrics_vae['prec']:.4f}"],
+        ["Umbral MSE", f"{metrics_cae['thresh']:.6f}", f"{metrics_vae['thresh']:.6f}"]
+    ]
+
+    # Crear tabla visual
+    table = ax0.table(cellText=table_data, loc='center', cellLoc='center', bbox=[0, 0, 1, 1])
+    table.auto_set_font_size(False)
+    table.set_fontsize(11)
+    table.scale(1, 2) # Escalar altura de filas
+
+    # Colorear encabezados
+    for i in range(3):
+        table[(0, i)].set_facecolor('#40466e') # Azul oscuro
+        table[(0, i)].set_text_props(color='white', weight='bold')
+    # Resaltar fila de Umbral (la última)
+    for i in range(3):
+        table[(4, i)].set_facecolor('#f0f0f0') # Gris claro para destacar diferencia
+        if i > 0: table[(4, i)].set_text_props(weight='bold', color='#d62728') # Rojo para los números
+
+    # SUBPLOT 2: Matriz CAE
+    ax1 = fig.add_subplot(gs[1, 0])
+    sns.heatmap(metrics_cae['cm'], annot=True, fmt='d', cmap='Blues', cbar=False, ax=ax1,
+                xticklabels=['Norm', 'Anom'], yticklabels=['Norm', 'Anom'])
+    ax1.set_title("CAE (Propuesto)")
+
+    # SUBPLOT 3: Matriz VAE
+    ax2 = fig.add_subplot(gs[2, 0])
+    sns.heatmap(metrics_vae['cm'], annot=True, fmt='d', cmap='Oranges', cbar=False, ax=ax2,
+                xticklabels=['Norm', 'Anom'], yticklabels=['Norm', 'Anom'])
+    ax2.set_title("VAE (Referencia)")
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(PATH_RESULTS, '4_comparativa_final.png'), dpi=300)
+    plt.close()
+
+    print("\n✅ ¡Reporte Generado! Revisa la imagen '4_comparativa_final.png' para ver los umbrales.")
+
+if __name__ == "__main__":
+    generar_reporte()

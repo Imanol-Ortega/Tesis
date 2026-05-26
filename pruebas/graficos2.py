@@ -7,6 +7,7 @@ from src.Procesamiento.preprocessor import DataPreprocessor
 # ================= CONFIGURACIÓN DE RUTAS =================
 FILE_NEA = os.path.join('data', 'nea', 'confirmados', 'nasa_exoplanets.csv')
 DIR_MAST = os.path.join('data', 'mast', 'csv')
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLANETA_BUSCADO = "BD-14 3065 b"
 
 def visualizar_por_nombre(nombre_planeta):
@@ -85,7 +86,10 @@ def visualizar_por_nombre(nombre_planeta):
 
     plt.tight_layout()
     # Guardar con el nombre del planeta
-    plt.savefig(f"prepro_{nombre_archivo_csv.replace('.csv', '.png')}", dpi=300)
+    plots_dir = os.path.join(BASE_DIR, 'graficos', 'preprocesamiento')
+    os.makedirs(plots_dir, exist_ok=True)
+    save_path = os.path.join(plots_dir, f"prepro_{nombre_archivo_csv.replace('.csv', '.png')}")
+    plt.savefig(save_path, dpi=300)
     plt.show()
 
 if __name__ == "__main__":
